@@ -18,34 +18,14 @@ async function getAndShowStoriesOnStart() {
  *
  * Returns the markup for the story.
  */
-/*function generateStoryMarkup(story, showDeleteBtn = false) {
+
+function generateStoryMarkup(story, showFavoriteBtn = true) {
   const hostName = story.getHostName();
-  const starType = currentUser.isFavorite(story) ? "fas" : "far";
-  const deleteBtn = showDeleteBtn ? `<button class="delete-btn">Delete</button>` : "";
+  const favoriteBtn = showFavoriteBtn ? getFavoriteButtonHTML(story) : "";
 
   return $(`
       <li id="${story.storyId}">
-        ${deleteBtn}
-        <span class="star">
-          <i class="${starType} fa-star"></i>
-        </span>
-        <a href="${story.url}" target="a_blank" class="story-link">
-          ${story.title}
-        </a>
-        <small class="story-hostname">(${hostName})</small>
-        <small class="story-author">by ${story.author}</small>
-        <small class="story-user">posted by ${story.username}</small>
-      </li>
-    `);
-}*/
-
-function generateStoryMarkup(story) {
-  // console.debug("generateStoryMarkup", story);
-
-  const hostName = story.getHostName();
-  
-  return $(`
-      <li id="${story.storyId}">
+        ${favoriteBtn}
         <a href="${story.url}" target="a_blank" class="story-link">
           ${story.title}
         </a>
@@ -55,6 +35,16 @@ function generateStoryMarkup(story) {
       </li>
     `);
 }
+
+/** Generates HTML for the favorite/unfavorite button */
+function getFavoriteButtonHTML(story) {
+  const isFavorite = currentUser.isFavorite(story);
+  const buttonText = isFavorite ? "Unfavorite" : "Favorite";
+  const buttonClass = isFavorite ? "unfavorite-btn" : "favorite-btn";
+  return `<button class="${buttonClass}">${buttonText}</button>`;
+}
+
+
 /** Gets list of stories from server, generates their HTML, and puts on page. */
 
 function putStoriesOnPage() {
@@ -96,4 +86,40 @@ async function handleStoryFormSubmit(evt) {
   }
 }
 
-$("#story-form").on("submit", handleStoryFormSubmit);
+/** Handle favorite/unfavorite button click */
+async function handleFavoriteClick(evt) {
+  const $tgt = $(evt.target);
+  const $closestLi = $tgt.closest("li");
+  const storyId = $closestLi.attr("id");
+  const story = storyList.stories.find(s => s.storyId === storyId);
+
+  if ($tgt.hasClass("unfavorite-btn")) {
+    await currentUser.removeFavorite(story);
+    $tgt.removeClass("unfavorite-btn").addClass("favorite-btn").text("Favorite");
+  } else {
+    await currentUser.addFavorite(story);
+    $tgt.removeClass("favorite-btn").addClass("unfavorite-btn").text("Unfavorite");
+  }
+}
+
+// Event listener for favorite/unfavorite buttons
+$allStoriesList.on("click", ".favorite-btn, .unfavorite-btn", handleFavoriteClick);
+
+/** Show the list of favorite stories */
+function putFavoritesListOnPage() {
+  console.debug("putFavoritesListOnPage");
+
+  $favoritesList.empty();
+
+  for (let story of currentUser.favorites) {
+    const $story = generateStoryMarkup(story, false);
+    $favoritesList.append($story);
+  }
+
+  $favoritesList.show();
+}
+
+// Event listener for showing the favorites
+$navFavorites.on("click", putFavoritesListOnPage);
+
+//$("#story-form").on("submit", handleStoryFormSubmit);
