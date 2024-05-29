@@ -37,6 +37,7 @@ function updateNavOnLogin() {
   // Define a function to handle the click event
 function navSubmitClick(evt) {
   console.debug("navSubmitClick", evt);
+  hidePageComponents();
   $("#story-form-container").show();
   // Your code to handle the click event goes here
 }
@@ -51,3 +52,14 @@ function updateNavOnLogin() {
   $navLogOut.show();
   $navUserProfile.text(`${currentUser.username}`).show();
 }
+
+
+/** Handle click on favorites to show the favorites list */
+function navFavoritesClick(evt) {
+  console.debug("navFavoritesClick", evt);
+  hidePageComponents();
+  putFavoritesListOnPage();
+}
+
+
+$("#nav-favorites").on("click", navFavoritesClick);
