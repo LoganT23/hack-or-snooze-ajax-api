@@ -24,9 +24,12 @@ class Story {
   /** Parses hostname out of URL and returns it. */
 
   getHostName() {
-    // UNIMPLEMENTED: complete this function!
-    return "hostname.com";
+    // Use the URL constructor to parse the URL
+    const url = new URL(this.url);
+    // Return the hostname part of the URL
+    return url.hostname;
   }
+  
 }
 
 
@@ -135,7 +138,7 @@ class User {
       data: { user: { username, password, name } },
     });
 
-    let { user } = response.data;
+    let { user } = response.data
 
     return new User(
       {
@@ -206,7 +209,7 @@ class User {
     }
   }
 
-/** Add a story to the user's list of favorites and update the API */
+
 async addFavorite(story) {
   this.favorites.push(story);
   await this._addOrRemoveFavorite("add", story);
@@ -228,7 +231,20 @@ async _addOrRemoveFavorite(newState, story) {
     data: { token },
   });
 }
+
+/** Check if a story is a favorite */
 isFavorite(story) {
   return this.favorites.some(s => s.storyId === story.storyId);
+} 
+
+ /** Delete a story and update the API */
+ async deleteStory(storyId) {
+  const token = this.loginToken;
+  await axios({
+    url: `${BASE_URL}/stories/${storyId}`,
+    method: "DELETE",
+    data: { token },
+  });
 }
+
 }

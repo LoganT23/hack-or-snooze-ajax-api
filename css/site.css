@@ -1,8 +1,11 @@
 /* General typography */
 
 body {
+    height: 100px;
+    width: 100%;
   font-family: Arimo, sans-serif;
   margin: 8px 7.5vw;
+  background-image: radial-gradient(circle, pink 45%, lightblue 100%);
 }
 
 h1 {

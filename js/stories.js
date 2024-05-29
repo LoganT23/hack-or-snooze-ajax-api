@@ -19,19 +19,22 @@ async function getAndShowStoriesOnStart() {
  * Returns the markup for the story.
  */
 
-function generateStoryMarkup(story, showFavoriteBtn = true) {
+function generateStoryMarkup(story, showFavoriteBtn = true, showDeleteBtn = false) {
+  // console.debug("generateStoryMarkup", story);
+
   const hostName = story.getHostName();
   const favoriteBtn = showFavoriteBtn ? getFavoriteButtonHTML(story) : "";
-
+  const deleteBtn = showDeleteBtn ? getDeleteButtonHTML() : "";
   return $(`
       <li id="${story.storyId}">
-        ${favoriteBtn}
+      ${favoriteBtn}
         <a href="${story.url}" target="a_blank" class="story-link">
           ${story.title}
         </a>
         <small class="story-hostname">(${hostName})</small>
-        <small class="story-author">by ${story.author}</small>
-        <small class="story-user">posted by ${story.username}</small>
+        ${deleteBtn}
+       <div> <small class="story-author">by ${story.author}</small></div>
+       <div> <small class="story-user">posted by ${story.username}</small></div>
       </li>
     `);
 }
@@ -44,6 +47,10 @@ function getFavoriteButtonHTML(story) {
   return `<button class="${buttonClass}">${buttonText}</button>`;
 }
 
+/** Generates HTML for the delete button */
+function getDeleteButtonHTML() {
+  return `<button class="delete-btn">Delete</button>`;
+}
 
 /** Gets list of stories from server, generates their HTML, and puts on page. */
 
@@ -54,7 +61,8 @@ function putStoriesOnPage() {
 
   // loop through all of our stories and generate HTML for them
   for (let story of storyList.stories) {
-    const $story = generateStoryMarkup(story);
+    const showDeleteBtn = currentUser && story.username === currentUser.username;
+    const $story = generateStoryMarkup(story, true, showDeleteBtn);
     $allStoriesList.append($story);
   }
 
@@ -75,7 +83,7 @@ async function handleStoryFormSubmit(evt) {
 
   try {
     const storyInstance = await storyList.addStory(currentUser, newStory);
-    const $story = generateStoryMarkup(storyInstance);
+    const $story = generateStoryMarkup(storyInstance, true, true);
     $("#all-stories-list").prepend($story);
 
     // Hide form and reset
@@ -85,6 +93,8 @@ async function handleStoryFormSubmit(evt) {
     console.error("Error adding story:", err);
   }
 }
+
+$("#story-form").on("submit", handleStoryFormSubmit);
 
 /** Handle favorite/unfavorite button click */
 async function handleFavoriteClick(evt) {
@@ -102,8 +112,27 @@ async function handleFavoriteClick(evt) {
   }
 }
 
+/** Handle delete button click */
+async function handleDeleteClick(evt) {
+  const $tgt = $(evt.target);
+  const $closestLi = $tgt.closest("li");
+  const storyId = $closestLi.attr("id");
+
+  try {
+    await currentUser.deleteStory(storyId);
+    $closestLi.remove();
+  } catch (err) {
+    console.error("Error deleting story:", err);
+  }
+}
+
+
+
 // Event listener for favorite/unfavorite buttons
 $allStoriesList.on("click", ".favorite-btn, .unfavorite-btn", handleFavoriteClick);
+
+// Event listener for delete buttons
+$allStoriesList.on("click", ".delete-btn", handleDeleteClick);
 
 /** Show the list of favorite stories */
 function putFavoritesListOnPage() {
@@ -121,5 +150,3 @@ function putFavoritesListOnPage() {
 
 // Event listener for showing the favorites
 $navFavorites.on("click", putFavoritesListOnPage);
-
-//$("#story-form").on("submit", handleStoryFormSubmit);

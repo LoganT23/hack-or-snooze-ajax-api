@@ -34,33 +34,20 @@ function updateNavOnLogin() {
   $navLogOut.show();
   $navUserProfile.text(`${currentUser.username}`).show();
 }
-
+  // Define a function to handle the click event
 function navSubmitClick(evt) {
   console.debug("navSubmitClick", evt);
-  hidePageComponents();
   $("#story-form-container").show();
-}
-
-$("#nav-submit").on("click", navSubmitClick);
-
-
-
-// Define a function to handle the click event
-/**function navSubmitClick(evt) {
-  console.debug("navSubmitClick", evt);
   // Your code to handle the click event goes here
 }
 
 // Attach the event handler function to the navbar link
 $("#nav-submit").on("click", navSubmitClick);
 
-/**function navSubmitClick(evt) {
-  console.debug("navSubmitClick", evt);
-  // Your code to handle the click event goes here
-
-  // For example, you might want to show the story submission form
-  $("#story-form-container").show();
+function updateNavOnLogin() {
+  console.debug("updateNavOnLogin");
+  $(".main-nav-links").show();
+  $navLogin.hide();
+  $navLogOut.show();
+  $navUserProfile.text(`${currentUser.username}`).show();
 }
-*/
-
-

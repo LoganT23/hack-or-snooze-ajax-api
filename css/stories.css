@@ -5,7 +5,7 @@
 }
 
 .stories-list > li {
-  color: gray;
+  color: black;
   font-size: 0.8rem;
   margin: 10px 0;
 }
@@ -20,9 +20,9 @@
 /* Individual stories */
 
 .story-link {
-  color: black;
+  color: rgb(0, 0, 0);
   font-size: 0.85rem;
-  font-weight: normal;
+  font-weight: bold;
   margin: 18px 0;
 }
 
@@ -31,9 +31,14 @@
 }
 
 .story-author {
-  margin-left: 2em;
+  font-size: 0.85rem;
+  color: green;
+  margin-left: 5em;
 }
 
 .story-user {
+  font-size: 0.85rem;
+  color: lightsalmon;
   display: block;
+  margin-left: 5em;
 }
